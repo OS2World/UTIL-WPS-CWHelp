@@ -1,0 +1,116 @@
+CWHelp class V0.1.0 19.01.2002
+------------------------------
+
+(C) Chris Wohlgemuth 2002
+http://www.geocities.com/SiliconValley/Sector/5785/
+http://www.os2world.com/cdwriting
+
+WPS class to display help from any program or
+REXX script without fighting with the OS/2 help
+system. Use setup strings to display a help
+panel.
+
+------------------------------
+
+I wrote this class to add real online help to
+DrDialog programs. The base package doesn't give
+access to the help facility so one had to use
+*.inf files and the view command instead which has
+some disadvantages.
+
+Displaying help with this class is really easy.
+The follwing code snippet shows, how to do it.
+A DrDialog demo application is also included.
+The help object which is created is a transient
+object. This means it will not survive a reboot.
+You may create as many help objects as necessary.
+
+--------------
+
+/* Display a help panel with the CWHelp class */
+call RxFuncAdd 'SysLoadFuncs', 'RexxUtil', 'SysLoadFuncs'
+call SysLoadFuncs
+
+/* Check if the class is already installed. */
+CALL SysQueryClassList("liste.")
+
+alreadyInstalled='N'
+DO b=1 to liste.0
+   if WORD(liste.b , 1)="CWHelp" THEN DO
+	alreadyInstalled='YES'
+	LEAVE
+   END 
+END
+
+/* Get directory with the help DLL */
+PARSE SOURCE . . theSource
+thePath=FILESPEC('drive',theSource)||FILESPEC('path',theSource)
+
+/* Register class if not already done */
+IF alreadyInstalled\='YES' THEN DO
+	rc=SysRegisterObjectClass("CWHelp", thePath||'CWHELP.DLL')
+END
+
+/* Create a help object */
+rc=SysCreateObject("CWHelp","Help Object", "<WP_DESKTOP>", "OBJECTID=<MY_HELP_OBJ>;", 'update')
+
+/* Set the help library name */
+ret=SysSetObjectData('<MY_HELP_OBJ>', 'HLPSETHELPLIBRARY='||thePath||'CWHelp.hlp')
+
+/* Display the help panel #10 */
+ret=SysSetObjectData('<MY_HELP_OBJ>', 'HLPSHOWHELPPANEL=10')
+
+/* Destroy the help object */
+ret=SysDestroyObject('<MY_HELP_OBJ>')
+
+/* Deregister the class to clean up. You may also
+   keep the class. It doesn't hurt ;-) */
+IF alreadyInstalled\='YES' THEN
+	rc=SysDeregisterObjectclass("CWHelp")
+EXIT
+
+--------------
+
+Problems
+--------
+
+The help file is locked by the WPS after first
+opening and therefore can't be deleted or moved.
+You've to restart the WPS to unlock it.
+
+
+License:
+--------
+/*
+ * Copyright (c) Chris Wohlgemuth 2002 
+ * All rights reserved.
+ *
+ * http://www.geocities.com/SiliconValley/Sector/5785/
+ * http://www.os2world.com/cdwriting
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The authors name may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ */
+
+

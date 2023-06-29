@@ -1,0 +1,14 @@
+LIBRARY CWHELP INITGLOBAL
+DESCRIPTION '$@#(C) C. Wohlgemuth 2002:#@##1## 19.01.2002 18:17:00      My ;-)  ::::0::@@ Help-Class V0.1.0' 
+PROTMODE
+CODE PRELOAD DISCARDABLE
+DATA SHARED LOADONCALL
+
+EXPORTS  
+        M_CWHelpClassData	@1
+        M_CWHelpCClassData	@2
+        M_CWHelpNewClass	@3
+        CWHelpClassData		@4
+        CWHelpCClassData	@5
+        CWHelpNewClass		@6
+
